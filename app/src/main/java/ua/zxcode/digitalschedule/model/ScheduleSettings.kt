@@ -5,21 +5,19 @@ data class ScheduleSettings(
     var saturdayEnabled: Boolean = false,
     var lessonCount: Int = 7,
     var lessonTimes: List<LessonTime> = List(7) { LessonTime.default(it) },
-    var breakDuration: Int = 5, // minutes
-    var isDarkTheme: Boolean = false, // нове поле для теми
-    var accentColor: AccentColor = AccentColor.BLUE, // нове поле для акценту
-    var firstWeekStartDate: String? = null, // дата початку першого тижня у форматі yyyy-MM-dd
-    var startReferenceDate: String? = null, // дата, з якої починається відлік (yyyy-MM-dd)
-    var startReferenceDayOfWeek: Int = 4, // 1=Пн ... 7=Нд (за замовчуванням четвер)
-    var startReferenceWeekType: Int = 1, // 1 або 2 (за замовчуванням 1 тиждень)
-    // --- нові поля для 10-денного циклу субот ---
-    var saturdayCycleStartDate: String? = null, // дата першої суботи циклу (yyyy-MM-dd)
-    var saturdayCycleStartDayOfWeek: Int = 1, // 1=Пн ... 5=Пт
-    var saturdayCycleStartWeekType: Int = 1, // 1 або 2
-    var saturdayType: Int = 0 // 0 - статична, 1 - чергування
+    var breakDuration: Int = 5,
+    var isDarkTheme: Boolean = false,
+    var accentColor: AccentColor = AccentColor.BLUE,
+    var firstWeekStartDate: String? = null,
+    var startReferenceDate: String? = null,
+    var startReferenceDayOfWeek: Int = 4,
+    var startReferenceWeekType: Int = 1,
+    var saturdayCycleStartDate: String? = null,
+    var saturdayCycleStartDayOfWeek: Int = 1,
+    var saturdayCycleStartWeekType: Int = 1,
+    var saturdayType: Int = 0
 )
 
-// Додаємо enum для акцентних кольорів веселки
 enum class AccentColor(val displayName: String) {
     RED("Червоний"),
     ORANGE("Оранжевий"),

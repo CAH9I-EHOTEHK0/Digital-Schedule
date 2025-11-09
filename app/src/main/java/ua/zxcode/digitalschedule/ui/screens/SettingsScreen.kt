@@ -32,7 +32,7 @@ fun SettingsScreen(
     var isDarkTheme by remember { mutableStateOf(settings.isDarkTheme) }
     var scheduleType by remember { mutableStateOf(settings.scheduleType) }
     var saturdayEnabled by remember { mutableStateOf(settings.saturdayEnabled) }
-    var saturdayType by remember { mutableStateOf(settings.saturdayType) } // 0 - статична, 1 - чергування
+    var saturdayType by remember { mutableStateOf(settings.saturdayType) }
     var lessonsPerDay by remember { mutableStateOf(settings.lessonCount) }
     var lessonTimes by remember { mutableStateOf(settings.lessonTimes.map { it.copy() }.toMutableList()) }
     var startReferenceDate by remember { mutableStateOf(settings.startReferenceDate ?: "") }
@@ -50,7 +50,6 @@ fun SettingsScreen(
         Text("Налаштування", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Тема
         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             Text("Тема:", modifier = Modifier.weight(1f))
             Switch(checked = isDarkTheme, onCheckedChange = { isDarkTheme = it })
@@ -58,7 +57,6 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Акцентний колір
         Text("Колір акценту", style = MaterialTheme.typography.titleMedium)
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -79,7 +77,6 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Тип розкладу
         Text("Тип розкладу:", style = MaterialTheme.typography.titleMedium)
         Row {
             RadioButton(selected = scheduleType.name == "ONE_WEEK", onClick = { scheduleType = ua.zxcode.digitalschedule.model.ScheduleType.ONE_WEEK })
@@ -89,7 +86,6 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Субота
         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             Text("Субота у розкладі:", modifier = Modifier.weight(1f))
             Switch(checked = saturdayEnabled, onCheckedChange = { saturdayEnabled = it })
@@ -107,7 +103,6 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Кількість пар
         Text("Кількість пар на день:", style = MaterialTheme.typography.titleMedium)
         androidx.compose.foundation.lazy.LazyRow(modifier = Modifier.fillMaxWidth()) {
             items(8) { n ->
@@ -121,7 +116,7 @@ fun SettingsScreen(
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-        // Час пар
+
         Text("Час пар:", style = MaterialTheme.typography.titleMedium)
         Column {
             lessonTimes.take(lessonsPerDay).forEachIndexed { idx, time ->
@@ -153,7 +148,6 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Початкова дата тижня
         OutlinedTextField(
             value = startReferenceDate,
             onValueChange = { startReferenceDate = it },
@@ -161,7 +155,7 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
-        // Тип першого тижня
+
         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             Text("Тип першого тижня:", modifier = Modifier.weight(1f))
             RadioButton(selected = startReferenceWeekType == 1, onClick = { startReferenceWeekType = 1 })
@@ -170,7 +164,7 @@ fun SettingsScreen(
             Text("2")
         }
         Spacer(modifier = Modifier.height(8.dp))
-        // Початкова дата суботи (для чергування)
+
         if (saturdayEnabled && saturdayType == 1) {
             OutlinedTextField(
                 value = saturdayCycleStartDate,
@@ -197,7 +191,6 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                // Оновлюємо lessonCount, lessonTimes і тип суботи у settings
                 val updatedSettings = settings.copy(
                     isDarkTheme = isDarkTheme,
                     accentColor = accentColor,
@@ -210,7 +203,6 @@ fun SettingsScreen(
                     saturdayCycleStartDate = saturdayCycleStartDate,
                     saturdayCycleStartDayOfWeek = saturdayCycleStartDayOfWeek,
                     saturdayCycleStartWeekType = saturdayCycleStartWeekType,
-                    // Додаємо тип суботи
                     saturdayType = saturdayType
                 )
                 lessonTimeManager.updateTimes(updatedSettings.lessonTimes.toMutableList())

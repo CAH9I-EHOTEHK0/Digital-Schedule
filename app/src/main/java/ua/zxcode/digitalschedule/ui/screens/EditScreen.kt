@@ -36,7 +36,6 @@ fun EditScreen(
     val lessonsByDay = allLessons.groupBy { it.dayOfWeek }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Header
         TopAppBar(
             title = { Text("Редагувати розклад") },
             actions = {
@@ -46,14 +45,12 @@ fun EditScreen(
             }
         )
 
-        // Дні тижня
-        // Визначаємо список днів для відображення
         val daysToShow = DayOfWeek.values().filter {
             if (!scheduleSettings.saturdayEnabled && it == DayOfWeek.SATURDAY) return@filter false
             if (it == DayOfWeek.SUNDAY) return@filter false
             true
         }
-        // Визначаємо, чи субота з чергуванням
+
         val isSaturdayCycledCurrent = scheduleSettings.saturdayEnabled && scheduleSettings.saturdayType == 1
         ScrollableTabRow(
             selectedTabIndex = daysToShow.indexOf(selectedDay.value),
@@ -68,7 +65,6 @@ fun EditScreen(
             }
         }
 
-        // Вибір тижня для двотижневого розкладу
         if (scheduleSettings.scheduleType == ua.zxcode.digitalschedule.model.ScheduleType.TWO_WEEK) {
             LazyRow(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 item {
@@ -86,7 +82,6 @@ fun EditScreen(
             }
         }
 
-        // Уроки обраного дня
         val lessons = lessonsByDay[selectedDay.value]?.filter {
             if (scheduleSettings.scheduleType == ua.zxcode.digitalschedule.model.ScheduleType.TWO_WEEK) {
                 selectedWeekType.value == null || it.weekType == null || it.weekType == selectedWeekType.value
@@ -116,7 +111,6 @@ fun EditScreen(
             }
         }
 
-        // Кнопка збереження
         Button(
             onClick = {
                 showAddDialog.value = true
@@ -130,7 +124,6 @@ fun EditScreen(
         }
     }
 
-    // Діалогове вікно для додавання/редагування уроку
     if (showAddDialog.value || showEditDialog.value != null) {
         AddLessonDialog(
             onAdd = { lesson ->

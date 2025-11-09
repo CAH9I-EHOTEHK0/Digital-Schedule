@@ -24,7 +24,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 @Composable
 fun HomeScreen(
     allLessons: List<Lesson>,
-    lessonTimeManager: LessonTimeManager, // залишаємо для інтерфейсу, навіть якщо не використовується
+    lessonTimeManager: LessonTimeManager,
     scheduleSettings: ScheduleSettings
 ) {
     val allowedDays = if (scheduleSettings.saturdayEnabled)

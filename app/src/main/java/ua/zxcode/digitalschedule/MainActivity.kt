@@ -40,7 +40,6 @@ class MainActivity : ComponentActivity() {
             val lessonTimeManager = remember { LessonTimeManager(settingsState.value.lessonTimes.toMutableList()) }
             val selectedTab = remember { mutableStateOf(0) }
 
-            // Слідкуємо за змінами налаштувань і зберігаємо автоматично
             LaunchedEffect(settingsState) {
                 saveSettings(context, settingsState.value)
             }
@@ -99,5 +98,5 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// --- залишаємо тільки Activity, DI, виклики екранів, saveSettings, loadSettings ---
+
 

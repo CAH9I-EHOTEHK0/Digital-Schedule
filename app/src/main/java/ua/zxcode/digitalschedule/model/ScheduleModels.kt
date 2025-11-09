@@ -13,7 +13,7 @@ enum class LessonType {
 data class Lesson(
     val id: Long? = null,
     val dayOfWeek: org.threeten.bp.DayOfWeek,
-    val weekType: String?, // "red" or "blue" for two-week schedule
+    val weekType: String?,
     val startTime: String,
     val endTime: String,
     val subject: String,
@@ -29,6 +29,6 @@ data class DaySchedule(
 )
 
 data class WeekSchedule(
-    val weekType: String?, // "red" or "blue" for two-week schedule
+    val weekType: String?,
     val days: List<DaySchedule>
 )
