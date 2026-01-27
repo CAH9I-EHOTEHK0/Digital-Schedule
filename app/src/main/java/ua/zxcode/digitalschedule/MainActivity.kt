@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
             val context = this
             val lessonStore = remember { LessonStore(context) }
             val lessonsState = lessonStore.lessons.collectAsState()
-            val allLessons = lessonsState.value // List<Lesson>
+            val allLessons = lessonsState.value
             val settingsState = remember { mutableStateOf(loadSettings(context)) }
             val lessonTimeManager = remember { LessonTimeManager(settingsState.value.lessonTimes.toMutableList()) }
             val selectedTab = remember { mutableStateOf(0) }
