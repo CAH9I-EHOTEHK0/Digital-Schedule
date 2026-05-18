@@ -14,12 +14,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import ua.zxcode.digitalschedule.ui.screens.HomeScreen
+import androidx.compose.ui.unit.dp
+import ua.zxcode.digitalschedule.ui.screens.HomeScreenContent
 import ua.zxcode.digitalschedule.ui.screens.EditScreen
 import ua.zxcode.digitalschedule.ui.screens.SettingsScreen
 
@@ -49,10 +52,11 @@ class MainActivity : ComponentActivity() {
                 accentColor = settingsState.value.accentColor
             ) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        Box(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+
+                        Box(modifier = Modifier.fillMaxSize()) {
                             when (selectedTab.value) {
-                                0 -> HomeScreen(
+                                0 -> HomeScreenContent(
                                     allLessons = allLessons,
                                     lessonTimeManager = lessonTimeManager,
                                     scheduleSettings = settingsState.value
@@ -75,10 +79,18 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
-                        ua.zxcode.digitalschedule.ui.BottomNavigationBar(
-                            selectedIndex = selectedTab.value,
-                            onItemSelected = { selectedTab.value = it }
-                        )
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter)
+                        ) {
+                            ua.zxcode.digitalschedule.ui.BottomNavigationBar(
+                                accentColor = MaterialTheme.colorScheme.primary,
+                                selectedIndex = selectedTab.value,
+                                onItemSelected = { selectedTab.value = it }
+                            )
+                        }
                     }
                 }
             }
@@ -97,6 +109,3 @@ class MainActivity : ComponentActivity() {
         return try { gson.fromJson(json, ScheduleSettings::class.java) } catch (_: Exception) { ScheduleSettings() }
     }
 }
-
-
-

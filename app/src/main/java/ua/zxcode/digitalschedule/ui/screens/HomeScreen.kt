@@ -22,7 +22,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 
 @Composable
-fun HomeScreen(
+fun HomeScreenContent(
     allLessons: List<Lesson>,
     lessonTimeManager: LessonTimeManager,
     scheduleSettings: ScheduleSettings
@@ -131,14 +131,6 @@ fun HomeScreen(
                 style = MaterialTheme.typography.bodyLarge
             )
         }
-        if (isSaturdayCycle) {
-            val startDate = try { org.threeten.bp.LocalDate.parse(scheduleSettings.saturdayCycleStartDate) } catch (_: Exception) { null }
-            val subotaCount = if (startDate != null) org.threeten.bp.temporal.ChronoUnit.WEEKS.between(startDate, shownDate.value).toInt() else -1
-            val cycleOptions = (1..5).map { Pair(it, 1) } + (1..5).map { Pair(it, 2) }
-            val startIdx = cycleOptions.indexOfFirst { it.first == scheduleSettings.saturdayCycleStartDayOfWeek && it.second == scheduleSettings.saturdayCycleStartWeekType }.let { if (it == -1) 0 else it }
-            val idx = (startIdx + subotaCount) % 10
-            val (cycleDay, cycleWeek) = if (idx in 0..9) cycleOptions[idx] else Pair(-1, -1)
-        }
         Spacer(Modifier.height(8.dp))
         if (lessonsForDay.isEmpty()) {
             if (isSaturdayCycle && saturdayCycleDay != null && saturdayCycleWeek != null) {
@@ -148,7 +140,13 @@ fun HomeScreen(
                 Text("Розклад відсутній. Додайте пари.", modifier = Modifier.align(androidx.compose.ui.Alignment.CenterHorizontally))
             }
         } else {
-            LazyColumn(modifier = Modifier.weight(1f)) {
+            LazyColumn(modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    top = 16.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 90.dp
+                )) {
                 items(lessonsForDay.size) { idx ->
                     val lesson = lessonsForDay[idx]
                     HomeLessonCard(

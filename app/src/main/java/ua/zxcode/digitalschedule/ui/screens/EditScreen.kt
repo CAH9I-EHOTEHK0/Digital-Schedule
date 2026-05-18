@@ -87,10 +87,14 @@ fun EditScreen(
                 selectedWeekType.value == null || it.weekType == null || it.weekType == selectedWeekType.value
             } else true
         } ?: emptyList()
-        LazyColumn(modifier = Modifier.weight(1f)) {
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp)
+        ) {
             items(lessons.size) { index ->
                 val lesson = lessons[index]
-                Card(modifier = Modifier.padding(8.dp)) {
+                Card(modifier = Modifier.padding(bottom = 8.dp)) {
                     Column(Modifier.padding(8.dp)) {
                         Text(text = "${lesson.startTime} - ${lesson.endTime}")
                         Text(text = lesson.subject)
@@ -109,18 +113,22 @@ fun EditScreen(
                     }
                 }
             }
-        }
 
-        Button(
-            onClick = {
-                showAddDialog.value = true
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            enabled = !(selectedDay.value == DayOfWeek.SATURDAY && isSaturdayCycledCurrent)
-        ) {
-            Text("Додати пару")
+            item {
+                Button(
+                    onClick = { showAddDialog.value = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 8.dp, end = 8.dp, bottom = 26.dp),
+                    enabled = !(selectedDay.value == DayOfWeek.SATURDAY && isSaturdayCycledCurrent)
+                ) {
+                    Text("Додати пару")
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(76.dp))
+            }
         }
     }
 

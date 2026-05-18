@@ -45,7 +45,7 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(start = 16.dp, end = 16.dp, top = 32.dp, bottom = 16.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 32.dp, bottom = 96.dp)
     ) {
         Text("Налаштування", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
