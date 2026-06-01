@@ -50,16 +50,23 @@ sealed class BottomNavItem(val label: String, val icon: ImageVector) {
 
 @Composable
 fun BottomNavigationBar(accentColor: Color, selectedIndex: Int, onItemSelected: (Int) -> Unit) {
-    val items = listOf(BottomNavItem.Home, BottomNavItem.Edit, BottomNavItem.Settings)
+    // логічний порядок (не змінюємо логіку MainActivity)
+    val logicalItems = listOf(BottomNavItem.Home, BottomNavItem.Edit, BottomNavItem.Settings)
+    // візуальний порядок, який хочемо показувати (Edit зліва, Home посередині)
+    val visualItems = listOf(BottomNavItem.Edit, BottomNavItem.Home, BottomNavItem.Settings)
+
     val islandShape = RoundedCornerShape(28.dp)
     val islandBackgroundColor = Color(red = 0.98f, green = 0.98f, blue = 0.98f, alpha = 0.1f)
 
     val density = LocalDensity.current
     var maxWidthDp by remember { mutableStateOf(0.dp) }
-    val buttonWidthDp = maxWidthDp / items.size
+    val buttonWidthDp = maxWidthDp / visualItems.size
+
+    // знайдемо, на якій візуальній позиції знаходиться поточний (логічний) selectedIndex
+    val visualSelectedIndex = visualItems.indexOf(logicalItems[selectedIndex])
 
     val indicatorOffsetX by animateDpAsState(
-        targetValue = buttonWidthDp * selectedIndex,
+        targetValue = buttonWidthDp * visualSelectedIndex,
         label = "IndicatorOffset",
         animationSpec = tween(durationMillis = 250)
     )
@@ -121,8 +128,10 @@ fun BottomNavigationBar(accentColor: Color, selectedIndex: Int, onItemSelected: 
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                items.forEachIndexed { index, item ->
-                    val isSelected = selectedIndex == index
+                // рендеримо у візуальному порядку, але при кліку передаємо логічний індекс
+                visualItems.forEachIndexed { visualIndex, item ->
+                    val logicalIndexForThisItem = logicalItems.indexOf(item)
+                    val isSelected = selectedIndex == logicalIndexForThisItem
 
                     val iconColor by animateColorAsState(
                         targetValue = if (isSelected) {
@@ -140,7 +149,10 @@ fun BottomNavigationBar(accentColor: Color, selectedIndex: Int, onItemSelected: 
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
-                            ) { onItemSelected(index) },
+                            ) {
+                                // передаємо логічний індекс (щоб MainActivity не потребував змін)
+                                onItemSelected(logicalIndexForThisItem)
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
