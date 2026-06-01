@@ -15,7 +15,10 @@ data class ScheduleSettings(
     var saturdayCycleStartDate: String? = null,
     var saturdayCycleStartDayOfWeek: Int = 1,
     var saturdayCycleStartWeekType: Int = 1,
-    var saturdayType: Int = 0
+    var saturdayType: Int = 0,
+    // NAU credentials
+    var Username: String = "",
+    var Password: String = ""
 )
 
 enum class AccentColor(val displayName: String) {

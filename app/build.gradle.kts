@@ -7,9 +7,7 @@ plugins {
 
 android {
     namespace = "ua.zxcode.digitalschedule"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ua.zxcode.digitalschedule"
@@ -59,6 +57,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation("org.jsoup:jsoup:1.17.2")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

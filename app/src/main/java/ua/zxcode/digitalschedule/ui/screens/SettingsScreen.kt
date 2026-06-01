@@ -19,6 +19,7 @@ import androidx.compose.foundation.border
 import ua.zxcode.digitalschedule.model.AccentColor
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 @Composable
 fun SettingsScreen(
@@ -40,6 +41,8 @@ fun SettingsScreen(
     var saturdayCycleStartDate by remember { mutableStateOf(settings.saturdayCycleStartDate ?: "") }
     var saturdayCycleStartDayOfWeek by remember { mutableStateOf(settings.saturdayCycleStartDayOfWeek) }
     var saturdayCycleStartWeekType by remember { mutableStateOf(settings.saturdayCycleStartWeekType) }
+    var Username by remember { mutableStateOf(settings.Username) }
+    var Password by remember { mutableStateOf(settings.Password) }
 
     Column(
         modifier = Modifier
@@ -50,6 +53,28 @@ fun SettingsScreen(
         Text("Налаштування", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
+        // ── NAU авторизація ──────────────────────────────────────────────────
+        Text("Кабінет НАУ", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(4.dp))
+        OutlinedTextField(
+            value = Username,
+            onValueChange = { Username = it },
+            label = { Text("Логін (номер залікової)") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        OutlinedTextField(
+            value = Password,
+            onValueChange = { Password = it },
+            label = { Text("Пароль") },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // ── Тема ─────────────────────────────────────────────────────────────
         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             Text("Тема:", modifier = Modifier.weight(1f))
             Switch(checked = isDarkTheme, onCheckedChange = { isDarkTheme = it })
@@ -130,7 +155,7 @@ fun SettingsScreen(
                             start = it
                             lessonTimes[idx] = lessonTimes[idx].copy(start = it)
                         },
-                        label = { Text("Початок (наприклад, 08:30)") },
+                        label = { Text("Початок") },
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -140,7 +165,7 @@ fun SettingsScreen(
                             end = it
                             lessonTimes[idx] = lessonTimes[idx].copy(end = it)
                         },
-                        label = { Text("Кінець (наприклад, 09:50)") },
+                        label = { Text("Кінець") },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -189,6 +214,7 @@ fun SettingsScreen(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = {
                 val updatedSettings = settings.copy(
@@ -203,7 +229,9 @@ fun SettingsScreen(
                     saturdayCycleStartDate = saturdayCycleStartDate,
                     saturdayCycleStartDayOfWeek = saturdayCycleStartDayOfWeek,
                     saturdayCycleStartWeekType = saturdayCycleStartWeekType,
-                    saturdayType = saturdayType
+                    saturdayType = saturdayType,
+                    Username = Username,
+                    Password = Password
                 )
                 lessonTimeManager.updateTimes(updatedSettings.lessonTimes.toMutableList())
                 onSaveSettings(context.applicationContext, updatedSettings)
@@ -216,11 +244,11 @@ fun SettingsScreen(
 }
 
 private fun getAccentColor(accent: AccentColor): Color = when (accent) {
-    AccentColor.RED -> Color(0xFFFF1744)
+    AccentColor.RED    -> Color(0xFFFF1744)
     AccentColor.ORANGE -> Color(0xFFFF9100)
     AccentColor.YELLOW -> Color(0xFFFFEA00)
-    AccentColor.GREEN -> Color(0xFF00E676)
-    AccentColor.BLUE -> Color(0xFF2979FF)
+    AccentColor.GREEN  -> Color(0xFF00E676)
+    AccentColor.BLUE   -> Color(0xFF2979FF)
     AccentColor.INDIGO -> Color(0xFF651FFF)
     AccentColor.VIOLET -> Color(0xFFD500F9)
 }

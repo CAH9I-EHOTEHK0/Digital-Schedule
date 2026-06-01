@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import ua.zxcode.digitalschedule.ui.screens.HomeScreenContent
 import ua.zxcode.digitalschedule.ui.screens.EditScreen
 import ua.zxcode.digitalschedule.ui.screens.SettingsScreen
@@ -53,13 +52,13 @@ class MainActivity : ComponentActivity() {
             ) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Box(modifier = Modifier.fillMaxSize()) {
-
                         Box(modifier = Modifier.fillMaxSize()) {
                             when (selectedTab.value) {
                                 0 -> HomeScreenContent(
                                     allLessons = allLessons,
                                     lessonTimeManager = lessonTimeManager,
-                                    scheduleSettings = settingsState.value
+                                    scheduleSettings = settingsState.value,
+                                    lessonStore = lessonStore          // ← передаємо
                                 )
                                 1 -> EditScreen(
                                     allLessons = allLessons,
@@ -99,8 +98,7 @@ class MainActivity : ComponentActivity() {
 
     private fun saveSettings(context: Context, settings: ScheduleSettings) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val json = gson.toJson(settings)
-        prefs.edit().putString(SETTINGS_KEY, json).apply()
+        prefs.edit().putString(SETTINGS_KEY, gson.toJson(settings)).apply()
     }
 
     private fun loadSettings(context: Context): ScheduleSettings {
