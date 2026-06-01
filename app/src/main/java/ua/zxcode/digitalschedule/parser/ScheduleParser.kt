@@ -13,7 +13,6 @@ object ScheduleParser {
     private const val USER_AGENT   =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36"
 
-    // повертає список Lesson або кидає Exception з описом помилки
     fun fetchLessons(username: String, password: String): List<Lesson> {
         val cookies = login(username, password)
             ?: throw Exception("Невірний логін або пароль")
@@ -52,27 +51,46 @@ object ScheduleParser {
     }
 
     private fun parseDoc(doc: org.jsoup.nodes.Document): List<Lesson> {
-        val lessons = mutableListOf<Lesson>()
+        // Ключ для дедублікації: день+час+предмет+тип тижня
+        // Сайт генерує окремий пейн для КОЖНОГО тижня семестру (1,2,3,4,...).
+        // Непарні тижні семестру (1,3,5...) = тижневий тип 1
+        // Парні тижні семестру (2,4,6...)   = тижневий тип 2
+        // Ми беремо лише ПЕРШИЙ пейн непарного і ПЕРШИЙ пейн парного тижня.
 
-        // Перший пейн = тиждень 1, другий = тиждень 2
+        val seen = mutableSetOf<String>() // для дедублікації
+        val result = mutableListOf<Lesson>()
+
+        // Знайдемо перший непарний і перший парний пейн
+        // data-week-name зазвичай виглядає як "1 тиждень", "2 тиждень", або просто порядковий номер
+        // Простіше: беремо перші 2 пейни — перший = тиждень 1, другий = тиждень 2.
+        // АЛЕ якщо сайт показує поточний тиждень першим (не обов'язково непарний),
+        // треба визначати парність за атрибутом.
+
         val panes = doc.select("div[id^=week-pane-]")
 
-        panes.forEachIndexed { paneIdx, weekPane ->
-            val weekNumber = paneIdx + 1 // 1 або 2
+        // Визначаємо weekType за номером пейна в атрибуті id або data-week-name
+        // id="week-pane-1", "week-pane-2" тощо — число відповідає номеру тижня семестру
+        val processedWeekTypes = mutableSetOf<Int>() // вже оброблені типи (1 і 2)
 
-            // Заголовки колонок з днями тижня
+        for (weekPane in panes) {
+            if (processedWeekTypes.size == 2) break // вже маємо обидва типи
+
+            // Витягуємо номер тижня з id="week-pane-N"
+            val weekNumStr = weekPane.id().removePrefix("week-pane-")
+            val weekNum = weekNumStr.toIntOrNull() ?: continue
+            val weekType = if (weekNum % 2 == 1) 1 else 2 // непарний=1, парний=2
+
+            if (weekType in processedWeekTypes) continue // вже обробили цей тип
+            processedWeekTypes.add(weekType)
+
             val dayHeaders = weekPane.select("div.grid-header-row div.grid-cell")
-                .map { cell ->
-                    val dayText = cell.ownText().trim()
-                    dayText
-                }
+                .map { it.ownText().trim() }
 
             weekPane.select("div.grid-row").forEach { row ->
                 val timeCell = row.selectFirst("div.grid-cell.bg-white") ?: return@forEach
                 val spans = timeCell.select("span.text-md")
                 if (spans.size < 2) return@forEach
 
-                // Час: "8" + наступний sibling "30" → "08:30"
                 fun buildTime(spanIdx: Int): String {
                     val h = spans[spanIdx].text().trim().padStart(2, '0')
                     val m = spans[spanIdx].nextElementSibling()?.text()?.trim()?.padStart(2, '0') ?: "00"
@@ -104,16 +122,21 @@ object ScheduleParser {
                             }
                         }
 
-                        // Група з бейджів
                         val badges = card.select("div.card-top-badge div")
                             .map { it.text().trim() }.filter { it.isNotBlank() }
                         val group = badges.firstOrNull { it.startsWith("Потік") || it.startsWith("Група") }
 
-                        lessons.add(
+                        // Дедублікація: та сама пара може з'явитись у тижні 1 і тижні 3
+                        // (обидва непарні) — пропускаємо дублікати
+                        val key = "$weekType|${dow.value}|$timeStart|$subject|$teacher"
+                        if (seen.contains(key)) return@forEach
+                        seen.add(key)
+
+                        result.add(
                             Lesson(
                                 id         = null,
                                 dayOfWeek  = dow,
-                                weekType   = weekNumber.toString(),
+                                weekType   = weekType.toString(),
                                 startTime  = timeStart,
                                 endTime    = timeEnd,
                                 subject    = subject,
@@ -128,17 +151,21 @@ object ScheduleParser {
             }
         }
 
-        return lessons
+        return result
     }
 
-    private fun parseDayOfWeek(text: String): DayOfWeek? = when {
-        text.startsWith("Пн") || text.startsWith("Пон") -> DayOfWeek.MONDAY
-        text.startsWith("Вт")                            -> DayOfWeek.TUESDAY
-        text.startsWith("Ср")                            -> DayOfWeek.WEDNESDAY
-        text.startsWith("Чт") || text.startsWith("Чет") -> DayOfWeek.THURSDAY
-        text.startsWith("Пт") || text.startsWith("Пʼ") || text.startsWith("Пя") -> DayOfWeek.FRIDAY
-        text.startsWith("Сб") || text.startsWith("Суб") -> DayOfWeek.SATURDAY
-        else -> null
+    private fun parseDayOfWeek(text: String): DayOfWeek? {
+        val t = text.lowercase()
+        return when {
+            t.startsWith("пон") || t.startsWith("пн") || t.startsWith("понеділок")-> DayOfWeek.MONDAY
+            t.startsWith("віт") || t.startsWith("вт") || t.startsWith("вівторок")-> DayOfWeek.TUESDAY
+            t.startsWith("сер") || t.startsWith("ср") || t.startsWith("середа")-> DayOfWeek.WEDNESDAY
+            t.startsWith("чет") || t.startsWith("чт") || t.startsWith("четвер")-> DayOfWeek.THURSDAY
+            t.startsWith("п'я") || t.startsWith("пʼя")|| t.startsWith("п`ятниця") || t.startsWith("пят") || t.startsWith("пт") -> DayOfWeek.FRIDAY
+            t.startsWith("суб") || t.startsWith("сб") || t.startsWith("субота")-> DayOfWeek.SATURDAY
+            t.startsWith("нед") || t.startsWith("нд") || t.startsWith("неділя")-> DayOfWeek.SUNDAY
+            else -> null
+        }
     }
 
     private fun mapLessonType(raw: String): LessonType = when {
