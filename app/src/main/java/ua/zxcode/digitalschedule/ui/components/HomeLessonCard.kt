@@ -36,32 +36,26 @@ fun HomeLessonCard(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = "${lesson.startTime} - ${lesson.endTime}",
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Text(
                     text = lesson.subject,
-                    style = MaterialTheme.typography.titleLarge,
-                    maxLines = 3,
-                    overflow = TextOverflow.Clip
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Text(
                     text = lesson.teacher,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 3,
-                    overflow = TextOverflow.Clip
+                    style = MaterialTheme.typography.bodyMedium
                 )
-                Text(text = lesson.lessonType.displayNameUa(), style = MaterialTheme.typography.bodySmall, maxLines = 1)
-                Text(text = lesson.room, style = MaterialTheme.typography.bodySmall, maxLines = 1)
+                Text(text = lesson.lessonType.displayNameUa(), style = MaterialTheme.typography.bodySmall)
+                Text(text = lesson.room, style = MaterialTheme.typography.bodySmall)
                 lesson.group?.let {
-                    Text(text = "Група: $it", style = MaterialTheme.typography.bodySmall, maxLines = 1)
+                    Text(text = "Група: $it", style = MaterialTheme.typography.bodySmall)
                 }
                 lesson.weekType?.let {
                     Text(
                         text = "Тиждень: $it",
                         style = MaterialTheme.typography.labelSmall,
-                        color = accentColor,
-                        maxLines = 1
+                        color = accentColor
                     )
                 }
             }

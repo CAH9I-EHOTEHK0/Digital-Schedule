@@ -25,6 +25,9 @@ import ua.zxcode.digitalschedule.ui.screens.HomeScreenContent
 import ua.zxcode.digitalschedule.ui.screens.EditScreen
 import ua.zxcode.digitalschedule.ui.screens.SettingsScreen
 
+import ua.zxcode.digitalschedule.data.GradeStore
+import ua.zxcode.digitalschedule.ui.screens.GradesScreen
+
 class MainActivity : ComponentActivity() {
     private val SETTINGS_KEY = "schedule_settings"
     private val gson = Gson()
@@ -36,11 +39,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             val context = this
             val lessonStore = remember { LessonStore(context) }
+            val gradeStore = remember { GradeStore(context) }
             val lessonsState = lessonStore.lessons.collectAsState()
             val allLessons = lessonsState.value
             val settingsState = remember { mutableStateOf(loadSettings(context)) }
             val lessonTimeManager = remember { LessonTimeManager(settingsState.value.lessonTimes.toMutableList()) }
             val selectedTab = remember { mutableStateOf(0) }
+            val isEditingScreenOpen = remember { mutableStateOf(false) }
 
             LaunchedEffect(settingsState) {
                 saveSettings(context, settingsState.value)
@@ -53,42 +58,53 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            when (selectedTab.value) {
-                                0 -> HomeScreenContent(
+                            if (isEditingScreenOpen.value) {
+                                EditScreen(
                                     allLessons = allLessons,
                                     lessonTimeManager = lessonTimeManager,
                                     scheduleSettings = settingsState.value,
-                                    lessonStore = lessonStore          // ← передаємо
+                                    lessonStore = lessonStore,
+                                    onNavigateBack = { isEditingScreenOpen.value = false }
                                 )
-                                1 -> EditScreen(
-                                    allLessons = allLessons,
-                                    lessonTimeManager = lessonTimeManager,
-                                    scheduleSettings = settingsState.value,
-                                    lessonStore = lessonStore
-                                )
-                                2 -> SettingsScreen(
-                                    settings = settingsState.value,
-                                    lessonTimeManager = lessonTimeManager,
-                                    context = context,
-                                    onSaveSettings = { ctx, newSettings ->
-                                        settingsState.value = newSettings.copy()
-                                        lessonTimeManager.updateTimes(newSettings.lessonTimes.toMutableList())
-                                        saveSettings(ctx, newSettings)
-                                    }
-                                )
+                            } else {
+                                when (selectedTab.value) {
+                                    0 -> HomeScreenContent(
+                                        allLessons = allLessons,
+                                        lessonTimeManager = lessonTimeManager,
+                                        scheduleSettings = settingsState.value,
+                                        lessonStore = lessonStore,
+                                        onNavigateToEdit = { isEditingScreenOpen.value = true }
+                                    )
+                                    1 -> GradesScreen(
+                                        gradeStore = gradeStore,
+                                        scheduleSettings = settingsState.value
+                                    )
+                                    2 -> SettingsScreen(
+                                        settings = settingsState.value,
+                                        lessonTimeManager = lessonTimeManager,
+                                        context = context,
+                                        onSaveSettings = { ctx, newSettings ->
+                                            settingsState.value = newSettings.copy()
+                                            lessonTimeManager.updateTimes(newSettings.lessonTimes.toMutableList())
+                                            saveSettings(ctx, newSettings)
+                                        }
+                                    )
+                                }
                             }
                         }
 
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.BottomCenter)
-                        ) {
-                            ua.zxcode.digitalschedule.ui.BottomNavigationBar(
-                                accentColor = MaterialTheme.colorScheme.primary,
-                                selectedIndex = selectedTab.value,
-                                onItemSelected = { selectedTab.value = it }
-                            )
+                        if (!isEditingScreenOpen.value) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.BottomCenter)
+                            ) {
+                                ua.zxcode.digitalschedule.ui.BottomNavigationBar(
+                                    accentColor = MaterialTheme.colorScheme.primary,
+                                    selectedIndex = selectedTab.value,
+                                    onItemSelected = { selectedTab.value = it }
+                                )
+                            }
                         }
                     }
                 }

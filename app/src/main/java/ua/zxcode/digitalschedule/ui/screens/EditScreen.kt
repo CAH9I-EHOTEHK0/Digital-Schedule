@@ -5,10 +5,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.threeten.bp.DayOfWeek
@@ -27,7 +29,8 @@ fun EditScreen(
     allLessons: List<Lesson>,
     lessonTimeManager: LessonTimeManager,
     scheduleSettings: ScheduleSettings,
-    lessonStore: LessonStore
+    lessonStore: LessonStore,
+    onNavigateBack: () -> Unit = {}
 ) {
     val showAddDialog = remember { mutableStateOf(false) }
     val showEditDialog = remember { mutableStateOf<Lesson?>(null) }
@@ -36,8 +39,13 @@ fun EditScreen(
     val lessonsByDay = allLessons.groupBy { it.dayOfWeek }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TopAppBar(
+        CenterAlignedTopAppBar(
             title = { Text("Редагувати розклад") },
+            navigationIcon = {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
+                }
+            },
             actions = {
                 IconButton(onClick = { showAddDialog.value = true }) {
                     Icon(Icons.Default.Add, contentDescription = "Додати урок")

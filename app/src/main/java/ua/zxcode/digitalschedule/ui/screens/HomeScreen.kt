@@ -8,6 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
@@ -32,13 +34,32 @@ import kotlinx.coroutines.withContext
 import ua.zxcode.digitalschedule.data.LessonStore
 import ua.zxcode.digitalschedule.parser.ScheduleParser
 import androidx.compose.ui.Alignment
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 
 @Composable
 fun HomeScreenContent(
     allLessons: List<Lesson>,
     lessonTimeManager: LessonTimeManager,
     scheduleSettings: ScheduleSettings,
-    lessonStore: LessonStore? = null   // потрібен для оновлення
+    lessonStore: LessonStore? = null,   // потрібен для оновлення
+    onNavigateToEdit: () -> Unit = {}
 ) {
     val allowedDays = if (scheduleSettings.saturdayEnabled)
         setOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
@@ -117,10 +138,19 @@ fun HomeScreenContent(
         AccentColor.VIOLET -> Color(0xFFD500F9)
     }
 
-    Column(
+    val islandShape = RoundedCornerShape(28.dp)
+    val islandBackgroundColor = Color(red = 0.98f, green = 0.98f, blue = 0.98f, alpha = 0.1f)
+
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(shownDate.value) {
+        listState.scrollToItem(0)
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .pointerInput(shownDate.value) {
+            .pointerInput(Unit) {
                 detectHorizontalDragGestures(
                     onDragStart = { dragAccum.value = 0f; swipeHandled.value = false },
                     onHorizontalDrag = { _, dragAmount ->
@@ -140,102 +170,163 @@ fun HomeScreenContent(
                 )
             }
     ) {
-        Spacer(Modifier.height(16.dp))
-
-        // ── Заголовок + кнопка оновлення ─────────────────────────────────────
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 32.dp, start = 16.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = dayNames[shownDate.value.dayOfWeek.value - 1] + " (${shownDate.value})",
-                    style = MaterialTheme.typography.titleLarge
-                )
-                if (isTwoWeek) {
+        // 1. Список пар (або порожній стан), який прокручується на весь екран
+        if (lessonsForDay.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 90.dp, bottom = 90.dp, start = 16.dp, end = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isSaturdayCycle && saturdayCycleDay != null && saturdayCycleWeek != null) {
+                    val dayNamesShort = listOf("Пн", "Вт", "Ср", "Чт", "Пт")
                     Text(
-                        text = currentWeekLabel ?: "",
-                        style = MaterialTheme.typography.bodyLarge
+                        "Субота: це ${dayNamesShort[saturdayCycleDay-1]} $saturdayCycleWeek тиждень. Пари відсутні.",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                } else {
+                    val refreshIconId = "refresh_icon"
+                    val annotatedString = buildAnnotatedString {
+                        append("Розклад відсутній. Додайте пари або натисніть ")
+                        appendInlineContent(refreshIconId, "[↻]")
+                        append(" для оновлення.")
+                    }
+                    val inlineContent = mapOf(
+                        Pair(
+                            refreshIconId,
+                            InlineTextContent(
+                                Placeholder(
+                                    width = 20.sp,
+                                    height = 20.sp,
+                                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "Оновити",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        )
+                    )
+                    Text(
+                        text = annotatedString,
+                        inlineContent = inlineContent,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(horizontal = 16.dp)
                     )
                 }
             }
-
-            // Кнопка оновлення видима тільки якщо є логін
-            if (lessonStore != null && scheduleSettings.Username.isNotBlank()) {
-                when (syncState) {
-                    is SyncState.Loading -> CircularProgressIndicator(modifier = Modifier.size(32.dp))
-                    else -> Button(
-                        onClick = {
-                            scope.launch {
-                                syncState = SyncState.Loading
-                                syncState = try {
-                                    val lessons = withContext(Dispatchers.IO) {
-                                        ScheduleParser.fetchLessons(
-                                            scheduleSettings.Username,
-                                            scheduleSettings.Password
-                                        )
-                                    }
-                                    lessonStore.clearAll()
-                                    // невелика затримка щоб Room встиг видалити
-                                    kotlinx.coroutines.delay(300)
-                                    lessonStore.addLessons(lessons)
-                                    SyncState.Success("Оновлено: ${lessons.size} пар")
-                                } catch (e: Exception) {
-                                    SyncState.Error(e.message ?: "Помилка")
-                                }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = accentColorValue)
-                    ) {
-                        Text("↻ Оновити")
-                    }
-                }
-            }
-        }
-
-        // Повідомлення про результат синхронізації
-        when (val s = syncState) {
-            is SyncState.Success -> Text(
-                s.message,
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = Color(0xFF00C853),
-                style = MaterialTheme.typography.bodySmall
-            )
-            is SyncState.Error -> Text(
-                "⚠ ${s.message}",
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = Color(0xFFD50000),
-                style = MaterialTheme.typography.bodySmall
-            )
-            else -> {}
-        }
-
-        Spacer(Modifier.height(8.dp))
-
-        if (lessonsForDay.isEmpty()) {
-            if (isSaturdayCycle && saturdayCycleDay != null && saturdayCycleWeek != null) {
-                val dayNamesShort = listOf("Пн", "Вт", "Ср", "Чт", "Пт")
-                Text(
-                    "Субота: це ${dayNamesShort[saturdayCycleDay-1]} $saturdayCycleWeek тиждень. Пари відсутні.",
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-            } else {
-                Text(
-                    "Розклад відсутній. Додайте пари або натисніть ↻ Оновити.",
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-            }
         } else {
             LazyColumn(
+                state = listState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 90.dp)
+                contentPadding = PaddingValues(top = 90.dp, start = 16.dp, end = 16.dp, bottom = 90.dp)
             ) {
                 items(lessonsForDay.size) { idx ->
                     HomeLessonCard(lesson = lessonsForDay[idx], accentColor = accentColorValue)
                 }
+            }
+        }
+
+        // 2. Повністю прозора верхня панель (тільки кнопки та текст)
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Кнопка переходу на екран редагування пар
+                Button(
+                    onClick = onNavigateToEdit,
+                    colors = ButtonDefaults.buttonColors(containerColor = accentColorValue)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Редагувати розклад",
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = dayNames[shownDate.value.dayOfWeek.value - 1] + " (${shownDate.value})",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    if (isTwoWeek) {
+                        Text(
+                            text = currentWeekLabel ?: "",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                // Кнопка оновлення видима тільки якщо є логін (або Spacer для балансу)
+                if (lessonStore != null && scheduleSettings.Username.isNotBlank()) {
+                    when (syncState) {
+                        is SyncState.Loading -> CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                        else -> Button(
+                            onClick = {
+                                scope.launch {
+                                    syncState = SyncState.Loading
+                                    syncState = try {
+                                        val lessons = withContext(Dispatchers.IO) {
+                                            ScheduleParser.fetchLessons(
+                                                scheduleSettings.Username,
+                                                scheduleSettings.Password
+                                            )
+                                        }
+                                        lessonStore.clearAll()
+                                        kotlinx.coroutines.delay(300)
+                                        lessonStore.addLessons(lessons)
+                                        SyncState.Success("Оновлено: ${lessons.size} пар")
+                                    } catch (e: Exception) {
+                                        SyncState.Error(e.message ?: "Помилка")
+                                    }
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = accentColorValue)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Оновити",
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+                } else {
+                    Spacer(modifier = Modifier.width(48.dp))
+                }
+            }
+
+            // Повідомлення про результат синхронізації
+            when (val s = syncState) {
+                is SyncState.Success -> Text(
+                    s.message,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 4.dp),
+                    color = Color(0xFF00C853),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                is SyncState.Error -> Text(
+                    "⚠ ${s.message}",
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 4.dp),
+                    color = Color(0xFFD50000),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                else -> {}
             }
         }
     }

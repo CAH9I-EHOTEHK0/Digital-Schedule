@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import ua.zxcode.digitalschedule.model.ScheduleSettings
 import ua.zxcode.digitalschedule.manager.LessonTimeManager
 import android.content.Context
+import android.text.Layout
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,7 @@ import androidx.compose.foundation.border
 import ua.zxcode.digitalschedule.model.AccentColor
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 @Composable
@@ -50,11 +52,16 @@ fun SettingsScreen(
             .verticalScroll(scrollState)
             .padding(start = 16.dp, end = 16.dp, top = 32.dp, bottom = 96.dp)
     ) {
-        Text("Налаштування", style = MaterialTheme.typography.headlineMedium)
+        //текст вирівняний по центру
+        Text(
+            text = "Налаштування",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         // ── NAU авторизація ──────────────────────────────────────────────────
-        Text("Кабінет НАУ", style = MaterialTheme.typography.titleMedium)
+        Text("Кабінет студента", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = Username,

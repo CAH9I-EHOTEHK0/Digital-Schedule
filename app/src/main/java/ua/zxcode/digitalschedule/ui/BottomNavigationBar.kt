@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -44,16 +45,16 @@ import androidx.compose.ui.unit.dp
 
 sealed class BottomNavItem(val label: String, val icon: ImageVector) {
     object Home : BottomNavItem("Головна", Icons.Filled.Home)
-    object Edit : BottomNavItem("Редагування", Icons.Filled.Edit)
+    object Grades : BottomNavItem("Оцінки", Icons.Filled.Star)
     object Settings : BottomNavItem("Налаштування", Icons.Filled.Settings)
 }
 
 @Composable
 fun BottomNavigationBar(accentColor: Color, selectedIndex: Int, onItemSelected: (Int) -> Unit) {
     // логічний порядок (не змінюємо логіку MainActivity)
-    val logicalItems = listOf(BottomNavItem.Home, BottomNavItem.Edit, BottomNavItem.Settings)
-    // візуальний порядок, який хочемо показувати (Edit зліва, Home посередині)
-    val visualItems = listOf(BottomNavItem.Edit, BottomNavItem.Home, BottomNavItem.Settings)
+    val logicalItems = listOf(BottomNavItem.Home, BottomNavItem.Grades, BottomNavItem.Settings)
+    // візуальний порядок, який хочемо показувати (Grades зліва, Home посередині)
+    val visualItems = listOf(BottomNavItem.Grades, BottomNavItem.Home, BottomNavItem.Settings)
 
     val islandShape = RoundedCornerShape(28.dp)
     val islandBackgroundColor = Color(red = 0.98f, green = 0.98f, blue = 0.98f, alpha = 0.1f)
