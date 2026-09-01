@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -84,13 +85,40 @@ fun GradesScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
+                var isRatingDialogOpen by remember { mutableStateOf(false) }
+
+                val currentSemesterIndex = pagerState.currentPage.coerceIn(0, (availableSemesters.size - 1).coerceAtLeast(0))
+                val currentSemesterName = availableSemesters.getOrNull(currentSemesterIndex) ?: "Семестр"
+                val currentGrades = allGrades[currentSemesterName] ?: emptyList()
+
+                if (isRatingDialogOpen) {
+                    ua.zxcode.digitalschedule.ui.components.RatingScoreDialog(
+                        semesterName = currentSemesterName,
+                        grades = currentGrades,
+                        accentColor = accentColorValue,
+                        onDismiss = { isRatingDialogOpen = false }
+                    )
+                }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Лівий невидимий плейсхолдер для ідеального центрування заголовка
-                    Box(modifier = Modifier.size(40.dp))
+                    // Ліва кнопка підрахунку рейтингового балу
+                    IconButton(
+                        onClick = { isRatingDialogOpen = true },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(accentColorValue, shape = androidx.compose.foundation.shape.CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Calculate,
+                            contentDescription = "Підрахувати рейтинговий бал",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
 
                     // Заголовок по центру
                     Text(
