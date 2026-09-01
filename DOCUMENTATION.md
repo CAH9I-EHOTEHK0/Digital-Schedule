@@ -52,7 +52,8 @@ app/src/main/java/ua/zxcode/digitalschedule/
 │   ├── LessonDao.kt            # Room DAO (CRUD операції з парами)
 │   ├── LessonEntity.kt         # Таблиця 'lessons' та мапери
 │   ├── LessonRepository.kt     # Репозиторій пар
-│   └── LessonStore.kt          # Управління списком пар у Room
+│   ├── LessonStore.kt          # Управління списком пар у Room
+│   └── NoteStore.kt            # Збереження нотаток до конкретних дат і пар (SharedPreferences)
 │
 ├── manager/                    # Бізнес-логіка
 │   └── LessonTimeManager.kt    # Управління часовими інтервалами пар
@@ -70,13 +71,16 @@ app/src/main/java/ua/zxcode/digitalschedule/
 └── ui/                         # Користувацький інтерфейс
     ├── BottomNavigationBar.kt  # Нижня плаваюча панель (3 вкладки)
     ├── components/
-    │   ├── AddLessonDialog.kt  # Діалог створення нової пари
-    │   ├── GradeCard.kt        # Картка відображення оцінки
-    │   └── HomeLessonCard.kt   # Картка пари на головному екрані
+    │   ├── AddLessonDialog.kt      # Діалог створення нової пари
+    │   ├── GradeCard.kt            # Картка відображення оцінки
+    │   ├── HomeLessonCard.kt       # Картка пари на головному екрані з прев'ю нотатки та крапочкою
+    │   ├── LessonNoteDialog.kt     # Діалог створення/редагування нотатки до пари
+    │   ├── RatingScoreDialog.kt    # Діалог розрахунку рейтингового балу
+    │   └── ScheduleGridOverlay.kt  # Інтерактивна таблиця-сітка розкладу з жестами
     ├── screens/
     │   ├── HomeScreen.kt       # Головний екран розкладу (свайпи, автооновлення)
     │   ├── GradesScreen.kt     # Екран оцінок сесії (семестри, оновлення)
-    │   ├── SettingsScreen.kt   # Екран налаштувань акаунта, теми, розкладу
+    │   ├── SettingsScreen.kt   # Екран налаштувань акаунта, теми, розкладу, очищення
     │   └── EditScreen.kt       # Повноекранний режим редагування пар
     └── theme/
         ├── Color.kt
@@ -149,10 +153,11 @@ data class LessonEntity(
 
 ## 7. Конфігурація та SharedPreferences
 
-- Назва преференсів: `digital_schedule_prefs`
+- Назва преференсів: `digital_schedule_prefs`, `digital_schedule_grade_prefs`, `digital_schedule_notes_prefs`
 - Ключі:
   - `schedule_settings` — серіалізований JSON конфігурації `ScheduleSettings`.
   - `grades_json` — кеш оцінок `Map<String, List<Grade>>`.
+  - `notes_json` — мапа нотаток `Map<String, String>` з ключами формату `YYYY-MM-DD#subject#startTime#dayOfWeek#weekType`.
 
 ---
 
