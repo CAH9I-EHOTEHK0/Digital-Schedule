@@ -317,23 +317,27 @@ fun ScheduleGridOverlay(
             }
 
             // Bottom Floating Close Button
-            IconButton(
-                onClick = onDismiss,
+            Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(bottom = 24.dp)
-                    .size(56.dp)
-                    .shadow(12.dp, CircleShape)
-                    .clip(CircleShape)
-                    .background(accentColor)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(bottom = 36.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Закрити таблицю",
-                    tint = crossColor,
-                    modifier = Modifier.size(28.dp)
-                )
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .shadow(12.dp, CircleShape)
+                        .clip(CircleShape)
+                        .background(accentColor)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Закрити таблицю",
+                        tint = crossColor,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
             }
         }
     }
