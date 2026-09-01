@@ -321,7 +321,7 @@ fun ScheduleGridOverlay(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .windowInsetsPadding(WindowInsets.navigationBars)
-                    .padding(bottom = 36.dp)
+                    .padding(bottom = 48.dp)
             ) {
                 IconButton(
                     onClick = onDismiss,
