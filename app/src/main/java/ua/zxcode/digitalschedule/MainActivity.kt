@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
             val context = this
             val lessonStore = remember { LessonStore(context) }
             val gradeStore = remember { GradeStore(context) }
+            val noteStore = remember { ua.zxcode.digitalschedule.data.NoteStore(context) }
             val lessonsState = lessonStore.lessons.collectAsState()
             val allLessons = lessonsState.value
             val settingsState = remember { mutableStateOf(loadSettings(context)) }
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
                                         lessonTimeManager = lessonTimeManager,
                                         scheduleSettings = settingsState.value,
                                         lessonStore = lessonStore,
+                                        noteStore = noteStore,
                                         onNavigateToEdit = { isEditingScreenOpen.value = true }
                                     )
                                     1 -> GradesScreen(

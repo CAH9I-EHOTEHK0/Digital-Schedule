@@ -53,12 +53,17 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 
+import ua.zxcode.digitalschedule.data.NoteStore
+import ua.zxcode.digitalschedule.ui.components.LessonNoteDialog
+import androidx.compose.runtime.collectAsState
+
 @Composable
 fun HomeScreenContent(
     allLessons: List<Lesson>,
     lessonTimeManager: LessonTimeManager,
     scheduleSettings: ScheduleSettings,
     lessonStore: LessonStore? = null,   // потрібен для оновлення
+    noteStore: NoteStore? = null,
     onNavigateToEdit: () -> Unit = {}
 ) {
     val allowedDays = if (scheduleSettings.saturdayEnabled)
@@ -137,6 +142,32 @@ fun HomeScreenContent(
 
     LaunchedEffect(shownDate.value) {
         listState.scrollToItem(0)
+    }
+
+    val notesState = noteStore?.notes?.collectAsState()
+    var selectedLessonForNote by remember { mutableStateOf<Lesson?>(null) }
+    val dateStr = shownDate.value.toString() // YYYY-MM-DD
+
+    if (selectedLessonForNote != null && noteStore != null) {
+        val currentLesson = selectedLessonForNote!!
+        val existingNote = noteStore.getNote(dateStr, currentLesson) ?: ""
+        LessonNoteDialog(
+            lesson = currentLesson,
+            dateStr = dateStr,
+            initialNote = existingNote,
+            accentColor = accentColorValue,
+            onSave = { text ->
+                noteStore.saveNote(dateStr, currentLesson, text)
+                selectedLessonForNote = null
+            },
+            onDelete = {
+                noteStore.deleteNote(dateStr, currentLesson)
+                selectedLessonForNote = null
+            },
+            onDismiss = {
+                selectedLessonForNote = null
+            }
+        )
     }
 
     Box(
@@ -219,7 +250,17 @@ fun HomeScreenContent(
                 contentPadding = PaddingValues(top = 90.dp, start = 16.dp, end = 16.dp, bottom = 90.dp)
             ) {
                 items(lessonsForDay.size) { idx ->
-                    HomeLessonCard(lesson = lessonsForDay[idx], accentColor = accentColorValue)
+                    val lesson = lessonsForDay[idx]
+                    val noteKey = noteStore?.makeNoteKey(dateStr, lesson)
+                    val note = if (noteKey != null && notesState != null) notesState.value[noteKey] else null
+                    HomeLessonCard(
+                        lesson = lesson,
+                        accentColor = accentColorValue,
+                        note = note,
+                        onClick = {
+                            selectedLessonForNote = lesson
+                        }
+                    )
                 }
             }
         }

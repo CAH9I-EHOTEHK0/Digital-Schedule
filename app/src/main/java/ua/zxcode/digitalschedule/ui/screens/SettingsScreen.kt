@@ -218,6 +218,54 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
 
+        // ── Очищення нотаток ────────────────────────────────────────────────
+        var showClearNotesDialog by remember { mutableStateOf(false) }
+        var notesClearedMessage by remember { mutableStateOf(false) }
+
+        if (showClearNotesDialog) {
+            AlertDialog(
+                onDismissRequest = { showClearNotesDialog = false },
+                title = { Text("Очистити всі нотатки?") },
+                text = { Text("Усі збережені нотатки до пар на всі дати будуть безповоротно видалені.") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            ua.zxcode.digitalschedule.data.NoteStore(context).clearAll()
+                            showClearNotesDialog = false
+                            notesClearedMessage = true
+                        },
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Видалити все")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showClearNotesDialog = false }) {
+                        Text("Скасувати")
+                    }
+                }
+            )
+        }
+
+        OutlinedButton(
+            onClick = { showClearNotesDialog = true },
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Очистити всі нотатки")
+        }
+        if (notesClearedMessage) {
+            Text(
+                text = "✓ Усі нотатки успішно видалено",
+                color = Color(0xFF00C853),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 4.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = {
                 val updatedSettings = settings.copy(
