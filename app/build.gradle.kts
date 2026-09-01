@@ -13,8 +13,8 @@ android {
         applicationId = "ua.zxcode.digitalschedule"
         minSdk = 24
         targetSdk = 36
-        versionCode = 3069
-        versionName = "3.0.69"
+        versionCode = 4069
+        versionName = "4.0.69"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
