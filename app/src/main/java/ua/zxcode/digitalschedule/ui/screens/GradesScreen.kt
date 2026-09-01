@@ -38,15 +38,7 @@ fun GradesScreen(
     var syncState by remember { mutableStateOf<GradeSyncState>(GradeSyncState.Idle) }
     val scope = rememberCoroutineScope()
 
-    val accentColorValue = when (scheduleSettings.accentColor) {
-        AccentColor.RED    -> Color(0xFFFF1744)
-        AccentColor.ORANGE -> Color(0xFFFF9100)
-        AccentColor.YELLOW -> Color(0xFFFFEA00)
-        AccentColor.GREEN  -> Color(0xFF00E676)
-        AccentColor.BLUE   -> Color(0xFF2979FF)
-        AccentColor.INDIGO -> Color(0xFF651FFF)
-        AccentColor.VIOLET -> Color(0xFFD500F9)
-    }
+    val accentColorValue = scheduleSettings.getAccentColor()
 
     fun doSync() {
         if (scheduleSettings.Username.isBlank()) {

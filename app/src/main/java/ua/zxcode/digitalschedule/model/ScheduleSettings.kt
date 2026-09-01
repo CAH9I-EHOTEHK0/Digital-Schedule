@@ -1,5 +1,7 @@
 package ua.zxcode.digitalschedule.model
 
+import androidx.compose.ui.graphics.Color
+
 data class ScheduleSettings(
     var scheduleType: ScheduleType = ScheduleType.ONE_WEEK,
     var saturdayEnabled: Boolean = false,
@@ -7,7 +9,8 @@ data class ScheduleSettings(
     var lessonTimes: List<LessonTime> = List(7) { LessonTime.default(it) },
     var breakDuration: Int = 5,
     var isDarkTheme: Boolean = false,
-    var accentColor: AccentColor = AccentColor.BLUE,
+    var accentColorHex: String = "#651FFF",
+    var accentColor: AccentColor = AccentColor.INDIGO,
     var firstWeekStartDate: String? = null,
     var startReferenceDate: String? = null,
     var startReferenceDayOfWeek: Int = 4,
@@ -19,7 +22,11 @@ data class ScheduleSettings(
     // NAU credentials
     var Username: String = "",
     var Password: String = ""
-)
+) {
+    fun getAccentColor(): Color {
+        return parseHexColor(accentColorHex)
+    }
+}
 
 enum class AccentColor(val displayName: String) {
     RED("Червоний"),
@@ -31,6 +38,26 @@ enum class AccentColor(val displayName: String) {
     VIOLET("Фіолетовий")
 }
 
+fun parseHexColor(hex: String, fallback: Color = Color(0xFF651FFF)): Color {
+    val clean = hex.removePrefix("#").trim()
+    return try {
+        when (clean.length) {
+            6 -> Color(android.graphics.Color.parseColor("#FF$clean"))
+            8 -> Color(android.graphics.Color.parseColor("#$clean"))
+            else -> fallback
+        }
+    } catch (_: Exception) {
+        fallback
+    }
+}
+
+fun Color.toHex(): String {
+    val redInt = (this.red * 255).toInt().coerceIn(0, 255)
+    val greenInt = (this.green * 255).toInt().coerceIn(0, 255)
+    val blueInt = (this.blue * 255).toInt().coerceIn(0, 255)
+    return String.format("#%02X%02X%02X", redInt, greenInt, blueInt)
+}
+
 data class LessonTime(
     val index: Int,
     var start: String,
@@ -39,13 +66,13 @@ data class LessonTime(
     companion object {
         fun default(index: Int): LessonTime {
             val times = listOf(
-                "08:30" to "10:00",
-                "10:15" to "11:45",
-                "12:00" to "13:30",
-                "13:45" to "15:15",
-                "15:30" to "17:00",
-                "17:15" to "18:45",
-                "19:00" to "20:30"
+                "08:00" to "09:35",
+                "09:50" to "11:25",
+                "11:40" to "13:15",
+                "13:30" to "15:05",
+                "15:20" to "16:55",
+                "17:10" to "18:45",
+                "19:00" to "20:35"
             )
             val (start, end) = times.getOrElse(index) { "" to "" }
             return LessonTime(index, start, end)

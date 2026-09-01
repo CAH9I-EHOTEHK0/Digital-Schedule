@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,7 +44,6 @@ fun GradeCard(
                     shape = RoundedCornerShape(16.dp)
                 ),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF181825)),
             elevation = CardDefaults.elevatedCardElevation(6.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -99,7 +99,7 @@ fun GradeCard(
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
-                                        .background(Color(0xFF7C3AED))
+                                        .background(accentColor)
                                         .padding(horizontal = 8.dp, vertical = 4.dp)
                                 ) {
                                     Text(
@@ -120,12 +120,12 @@ fun GradeCard(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(if (isLate) Color(0xFF991B1B) else Color(0xFF1E293B))
+                                    .background(if (isLate) Color(0xFF991B1B) else MaterialTheme.colorScheme.surfaceVariant)
                                     .padding(horizontal = 10.dp, vertical = 4.dp)
                             ) {
                                 Text(
                                     text = dateStr,
-                                    color = if (isLate) Color(0xFFFCA5A5) else Color(0xFFCBD5E1),
+                                    color = if (isLate) Color(0xFFFCA5A5) else MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Medium
@@ -151,14 +151,14 @@ fun GradeCard(
                                     fontWeight = FontWeight.Bold,
                                     lineHeight = 20.sp
                                 ),
-                                color = Color.White
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             if (grade.teacher.isNotBlank()) {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = grade.teacher,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFF94A3B8)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -172,25 +172,20 @@ fun GradeCard(
                                 modifier = Modifier.size(60.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                // Фонове кільце
-                                CircularProgressIndicator(
-                                    progress = { 1f },
-                                    modifier = Modifier.fillMaxSize(),
-                                    color = Color(0xFF334155),
-                                    strokeWidth = 4.dp
-                                )
-                                // Прогрес кільце
+                                // Круговий прогрес-бар з trackColor та StrokeCap.Butt (без білих зазорок)
                                 CircularProgressIndicator(
                                     progress = { (grade.points ?: 0) / 100f },
                                     modifier = Modifier.fillMaxSize(),
                                     color = ratingColor,
-                                    strokeWidth = 4.dp
+                                    trackColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                                    strokeWidth = 4.dp,
+                                    strokeCap = StrokeCap.Butt
                                 )
                                 // Текст всередині кільця (Бал зверху, Літера A/B/C знизу)
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
                                         text = grade.points?.toString() ?: "—",
-                                        color = Color.White,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         style = MaterialTheme.typography.titleSmall.copy(
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 15.sp
@@ -214,7 +209,7 @@ fun GradeCard(
                                 Text(
                                     text = verbal,
                                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
-                                    color = Color(0xFFCBD5E1)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }

@@ -128,15 +128,7 @@ fun HomeScreenContent(
     val dragAccum   = remember { mutableStateOf(0f) }
     val swipeHandled = remember { mutableStateOf(false) }
 
-    val accentColorValue = when (scheduleSettings.accentColor) {
-        AccentColor.RED    -> Color(0xFFFF1744)
-        AccentColor.ORANGE -> Color(0xFFFF9100)
-        AccentColor.YELLOW -> Color(0xFFFFEA00)
-        AccentColor.GREEN  -> Color(0xFF00E676)
-        AccentColor.BLUE   -> Color(0xFF2979FF)
-        AccentColor.INDIGO -> Color(0xFF651FFF)
-        AccentColor.VIOLET -> Color(0xFFD500F9)
-    }
+    val accentColorValue = scheduleSettings.getAccentColor()
 
     val islandShape = RoundedCornerShape(28.dp)
     val islandBackgroundColor = Color(red = 0.98f, green = 0.98f, blue = 0.98f, alpha = 0.1f)

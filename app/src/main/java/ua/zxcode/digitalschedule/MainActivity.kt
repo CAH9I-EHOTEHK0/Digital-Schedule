@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
 
             DigitalScheduleTheme(
                 darkTheme = settingsState.value.isDarkTheme,
-                accentColor = settingsState.value.accentColor
+                accentColorHex = settingsState.value.accentColorHex
             ) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Box(modifier = Modifier.fillMaxSize()) {
