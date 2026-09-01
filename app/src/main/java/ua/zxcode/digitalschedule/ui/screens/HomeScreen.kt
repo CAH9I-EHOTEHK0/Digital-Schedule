@@ -16,12 +16,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import org.threeten.bp.DayOfWeek
-import ua.zxcode.digitalschedule.model.AccentColor
 import ua.zxcode.digitalschedule.model.ScheduleType
 import ua.zxcode.digitalschedule.ui.components.HomeLessonCard
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ButtonDefaults
@@ -232,6 +232,18 @@ fun HomeScreenContent(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
+            var isGridOverlayOpen by remember { mutableStateOf(false) }
+
+            if (isGridOverlayOpen) {
+                ua.zxcode.digitalschedule.ui.components.ScheduleGridOverlay(
+                    allLessons = allLessons,
+                    lessonTimeManager = lessonTimeManager,
+                    scheduleSettings = scheduleSettings,
+                    initialWeek = weekNumber,
+                    onDismiss = { isGridOverlayOpen = false }
+                )
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -249,7 +261,13 @@ fun HomeScreenContent(
                     )
                 }
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { isGridOverlayOpen = true }
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
                     Text(
                         text = dayNames[shownDate.value.dayOfWeek.value - 1] + " (${shownDate.value})",
                         style = MaterialTheme.typography.titleMedium
