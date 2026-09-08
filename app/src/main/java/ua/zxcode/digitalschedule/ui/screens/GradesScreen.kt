@@ -73,7 +73,6 @@ fun GradesScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // ── Верхня непрозора шапка з вирівняним по центру заголовком ─────────────────────
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.surface,
@@ -105,7 +104,6 @@ fun GradesScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Ліва кнопка підрахунку рейтингового балу
                     IconButton(
                         onClick = { isRatingDialogOpen = true },
                         modifier = Modifier
@@ -120,7 +118,6 @@ fun GradesScreen(
                         )
                     }
 
-                    // Заголовок по центру
                     Text(
                         text = "Оцінки",
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
@@ -128,7 +125,6 @@ fun GradesScreen(
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
 
-                    // Права кнопка оновлення з фіолетовим бекграундом
                     IconButton(
                         onClick = { doSync() },
                         modifier = Modifier
@@ -144,7 +140,6 @@ fun GradesScreen(
                     }
                 }
 
-                // Перемикач семестрів (Tabs)
                 if (availableSemesters.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     ScrollableTabRow(
@@ -166,7 +161,6 @@ fun GradesScreen(
                     }
                 }
 
-                // Повідомлення про результат синхронізації
                 when (val s = syncState) {
                     is GradeSyncState.Success -> Text(
                         s.message,
@@ -185,7 +179,6 @@ fun GradesScreen(
             }
         }
 
-        // ── Основний вміст (HorizontalPager для свайпів) ──────────────────────────────────
         if (syncState is GradeSyncState.Loading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

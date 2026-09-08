@@ -45,7 +45,6 @@ fun LessonNoteDialog(
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Header info
                 Text(
                     text = lesson.subject,
                     style = MaterialTheme.typography.titleLarge,
@@ -73,7 +72,6 @@ fun LessonNoteDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Text field for note
                 OutlinedTextField(
                     value = noteText,
                     onValueChange = { noteText = it },
@@ -92,13 +90,11 @@ fun LessonNoteDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Action buttons: Cancel, optional Delete, Save
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Close / Cancel Button (Circle with accent color or accent outline)
                     IconButton(
                         onClick = onDismiss,
                         modifier = Modifier
@@ -116,7 +112,6 @@ fun LessonNoteDialog(
                         )
                     }
 
-                    // Delete Button if note existed
                     if (initialNote.isNotBlank()) {
                         IconButton(
                             onClick = onDelete,
@@ -136,7 +131,6 @@ fun LessonNoteDialog(
                         }
                     }
 
-                    // Save / Check Button (Circle filled with accent color)
                     IconButton(
                         onClick = { onSave(noteText) },
                         modifier = Modifier

@@ -26,7 +26,6 @@ class NoteStore(context: Context) {
     }
 
     fun makeNoteKey(dateStr: String, lesson: Lesson): String {
-        // Формуємо стійкий ідентифікатор пари, незалежний від автоінкрементного ID в базі
         val cleanSubject = lesson.subject.trim()
         val cleanStartTime = lesson.startTime.trim()
         val dayOfWeek = lesson.dayOfWeek.value
@@ -36,7 +35,6 @@ class NoteStore(context: Context) {
 
     fun getNote(dateStr: String, lesson: Lesson): String? {
         val key = makeNoteKey(dateStr, lesson)
-        // Також перевіряємо старий формат ключа на випадок збережених раніше даних
         val note = _notes.value[key]
         if (note != null) return note
 
@@ -54,7 +52,6 @@ class NoteStore(context: Context) {
         val trimmed = noteText.trim()
         if (trimmed.isEmpty()) {
             updated.remove(key)
-            // Також видаляємо можливі старі формати ключів
             lesson.id?.let { updated.remove("$dateStr#$it") }
             updated.remove("$dateStr#${lesson.subject}_${lesson.startTime}_${lesson.dayOfWeek.value}")
         } else {

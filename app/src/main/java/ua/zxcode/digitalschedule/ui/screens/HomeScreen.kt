@@ -62,7 +62,7 @@ fun HomeScreenContent(
     allLessons: List<Lesson>,
     lessonTimeManager: LessonTimeManager,
     scheduleSettings: ScheduleSettings,
-    lessonStore: LessonStore? = null,   // потрібен для оновлення
+    lessonStore: LessonStore? = null,
     noteStore: NoteStore? = null,
     onNavigateToEdit: () -> Unit = {}
 ) {
@@ -193,7 +193,6 @@ fun HomeScreenContent(
                 )
             }
     ) {
-        // 1. Список пар (або порожній стан), який прокручується на весь екран
         if (lessonsForDay.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -265,7 +264,6 @@ fun HomeScreenContent(
             }
         }
 
-        // 2. Повністю прозора верхня панель (тільки кнопки та текст)
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -290,7 +288,6 @@ fun HomeScreenContent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Кнопка переходу на екран редагування пар
                 Button(
                     onClick = onNavigateToEdit,
                     colors = ButtonDefaults.buttonColors(containerColor = accentColorValue)
@@ -321,7 +318,6 @@ fun HomeScreenContent(
                     }
                 }
 
-                // Кнопка оновлення видима тільки якщо є логін (або Spacer для балансу)
                 if (lessonStore != null && scheduleSettings.Username.isNotBlank()) {
                     when (syncState) {
                         is SyncState.Loading -> CircularProgressIndicator(modifier = Modifier.size(32.dp))
@@ -359,7 +355,6 @@ fun HomeScreenContent(
                 }
             }
 
-            // Повідомлення про результат синхронізації
             when (val s = syncState) {
                 is SyncState.Success -> Text(
                     s.message,

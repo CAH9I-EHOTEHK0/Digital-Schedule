@@ -48,7 +48,6 @@ fun GradeCard(
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    // ── Верхній рядок з бейджами (Форма контролю + Абревіатура типу ОК + Дата) ──
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -58,7 +57,6 @@ fun GradeCard(
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Форма контролю (жовто-оранжевий бейдж)
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
@@ -75,7 +73,6 @@ fun GradeCard(
                                 )
                             }
 
-                            // Абревіатура типу компонента (Д - Дисципліна, КР - Курсова, П - Практика)
                             grade.componentTypeAbbr?.let { abbr ->
                                 Box(
                                     modifier = Modifier
@@ -94,7 +91,6 @@ fun GradeCard(
                                 }
                             }
 
-                            // Бейдж "Вибіркова"
                             if (grade.isSelective) {
                                 Box(
                                     modifier = Modifier
@@ -114,7 +110,6 @@ fun GradeCard(
                             }
                         }
 
-                        // Дата бейдж
                         grade.date?.let { dateStr ->
                             val isLate = dateStr.contains("невчасно")
                             Box(
@@ -137,13 +132,11 @@ fun GradeCard(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // ── Основний блок: Назва предмета/викладач зліва + Кільце оцінки справа ────
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Ліва частина (Назва та Викладач)
                         Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                             Text(
                                 text = grade.subject.uppercase(),
@@ -163,7 +156,6 @@ fun GradeCard(
                             }
                         }
 
-                        // Права частина (Круговий індикатор оцінки + Словесна оцінка)
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
@@ -172,7 +164,6 @@ fun GradeCard(
                                 modifier = Modifier.size(60.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                // Круговий прогрес-бар з trackColor та StrokeCap.Butt (без білих зазорок)
                                 CircularProgressIndicator(
                                     progress = { (grade.points ?: 0) / 100f },
                                     modifier = Modifier.fillMaxSize(),
@@ -181,7 +172,6 @@ fun GradeCard(
                                     strokeWidth = 4.dp,
                                     strokeCap = StrokeCap.Butt
                                 )
-                                // Текст всередині кільця (Бал зверху, Літера A/B/C знизу)
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
                                         text = grade.points?.toString() ?: "—",
@@ -216,7 +206,6 @@ fun GradeCard(
                     }
                 }
 
-                // ── Нижня плашка "Погоджено оцінку" (якщо approved == true) ─────────────────
                 if (grade.approved) {
                     Box(
                         modifier = Modifier

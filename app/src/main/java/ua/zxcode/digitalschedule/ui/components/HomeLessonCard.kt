@@ -44,7 +44,6 @@ fun HomeLessonCard(
             elevation = CardDefaults.elevatedCardElevation(6.dp)
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
-                // Крапочка-індикатор нотатки у верхньому правому кутку
                 if (!note.isNullOrBlank()) {
                     Box(
                         modifier = Modifier
@@ -81,7 +80,6 @@ fun HomeLessonCard(
                         )
                     }
 
-                    // Якщо є нотатка — показуємо акуратний блок знизу картки
                     if (!note.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Box(
@@ -94,7 +92,7 @@ fun HomeLessonCard(
                                 .padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "📝 $note",
+                                text = " $note",
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontSize = 12.sp,
                                     fontStyle = FontStyle.Italic

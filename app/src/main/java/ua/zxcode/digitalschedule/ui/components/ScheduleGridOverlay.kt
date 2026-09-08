@@ -70,7 +70,6 @@ fun ScheduleGridOverlay(
     val lessonTimes = lessonTimeManager.allLessonTimes().take(scheduleSettings.lessonCount.coerceAtLeast(5))
     val accentColor = scheduleSettings.getAccentColor()
 
-    // Gestures: zoom (scale) and pan (offset)
     var scale by remember { mutableStateOf(1f) }
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
@@ -104,7 +103,6 @@ fun ScheduleGridOverlay(
                     }
                 }
         ) {
-            // Transformable & Scrollable content container
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -126,12 +124,10 @@ fun ScheduleGridOverlay(
                         .border(1.dp, outlineColor, RoundedCornerShape(16.dp))
                         .padding(12.dp)
                 ) {
-                    // Header Row (Days of week)
                     Row(
                         modifier = Modifier.padding(bottom = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Top-left cell: Time header
                         Box(
                             modifier = Modifier
                                 .width(70.dp)
@@ -168,7 +164,6 @@ fun ScheduleGridOverlay(
                         }
                     }
 
-                    // Schedule Grid Rows (Pairs 1..N)
                     lessonTimes.forEachIndexed { pairIndex, lt ->
                         val pairNum = pairIndex + 1
                         val timeSlotText = if (lt.start.isNotBlank() && lt.end.isNotBlank()) {
@@ -181,7 +176,6 @@ fun ScheduleGridOverlay(
                             modifier = Modifier.padding(vertical = 3.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Left Cell: Lesson Pair Number & Time
                             Box(
                                 modifier = Modifier
                                     .width(70.dp)
@@ -208,7 +202,6 @@ fun ScheduleGridOverlay(
                                 }
                             }
 
-                            // Day Columns for this Pair
                             days.forEach { (dayOfWeek, _) ->
                                 Spacer(modifier = Modifier.width(6.dp))
 
@@ -229,7 +222,6 @@ fun ScheduleGridOverlay(
                 }
             }
 
-            // Top Bar: Week Switcher & Zoom Quick Controls
             Column(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -274,7 +266,6 @@ fun ScheduleGridOverlay(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // Zoom quick-action bar (+ / - / reset)
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(14.dp))
@@ -316,7 +307,6 @@ fun ScheduleGridOverlay(
                 }
             }
 
-            // Bottom Floating Close Button
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -423,7 +413,7 @@ private fun matchesTimeSlot(lessonStartTime: String, slotStart: String, pairNum:
     if (lessonStartTime.isNotBlank() && slotStart.isNotBlank() && lessonStartTime == slotStart) {
         return true
     }
-    // Fallback: match approximate NAU default times if slotStart differs
+
     val defaultStarts = listOf("08:00", "09:50", "11:40", "13:30", "15:20", "17:10", "19:00")
     val defaultSlot = defaultStarts.getOrNull(pairNum - 1) ?: ""
     return lessonStartTime == defaultSlot

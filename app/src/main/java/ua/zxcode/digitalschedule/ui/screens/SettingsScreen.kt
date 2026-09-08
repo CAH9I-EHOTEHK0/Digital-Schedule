@@ -62,7 +62,6 @@ fun SettingsScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── NAU авторизація ──────────────────────────────────────────────────
         Text("Кабінет студента", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
@@ -83,7 +82,6 @@ fun SettingsScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── Тема ─────────────────────────────────────────────────────────────
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Тема:", modifier = Modifier.weight(1f))
             Switch(checked = isDarkTheme, onCheckedChange = { isDarkTheme = it })
@@ -91,14 +89,12 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── Колір акценту (Палітра, HEX, RGB) ─────────────────────────────────
         AccentColorPicker(
             currentHex = accentColorHex,
             onColorChanged = { newHex -> accentColorHex = newHex }
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── Тип розкладу ──────────────────────────────────────────────────────
         Text("Тип розкладу:", style = MaterialTheme.typography.titleMedium)
         Row {
             RadioButton(
@@ -218,7 +214,6 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── Очищення нотаток ────────────────────────────────────────────────
         var showClearNotesDialog by remember { mutableStateOf(false) }
         var notesClearedMessage by remember { mutableStateOf(false) }
 
@@ -339,7 +334,6 @@ private fun AccentColorPicker(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 2. Інтерактивна Спектр-палітра (Hue Gradient Slider)
         Text("Палітра спектру кольорів:", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
         Spacer(modifier = Modifier.height(4.dp))
         val spectrumBrush = Brush.horizontalGradient(
@@ -365,7 +359,6 @@ private fun AccentColorPicker(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 3. Поле для вводу HEX (з прев'ю блоком кольору)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -396,7 +389,6 @@ private fun AccentColorPicker(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 4. Слайдери RGB (Red, Green, Blue)
         val r = (currentColor.red * 255).toInt().coerceIn(0, 255)
         val g = (currentColor.green * 255).toInt().coerceIn(0, 255)
         val b = (currentColor.blue * 255).toInt().coerceIn(0, 255)

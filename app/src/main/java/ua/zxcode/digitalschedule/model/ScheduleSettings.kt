@@ -19,7 +19,6 @@ data class ScheduleSettings(
     var saturdayCycleStartDayOfWeek: Int = 1,
     var saturdayCycleStartWeekType: Int = 1,
     var saturdayType: Int = 0,
-    // NAU credentials
     var Username: String = "",
     var Password: String = ""
 ) {

@@ -51,9 +51,7 @@ sealed class BottomNavItem(val label: String, val icon: ImageVector) {
 
 @Composable
 fun BottomNavigationBar(accentColor: Color, selectedIndex: Int, onItemSelected: (Int) -> Unit) {
-    // логічний порядок (не змінюємо логіку MainActivity)
     val logicalItems = listOf(BottomNavItem.Home, BottomNavItem.Grades, BottomNavItem.Settings)
-    // візуальний порядок, який хочемо показувати (Grades зліва, Home посередині)
     val visualItems = listOf(BottomNavItem.Grades, BottomNavItem.Home, BottomNavItem.Settings)
 
     val islandShape = RoundedCornerShape(28.dp)
@@ -63,7 +61,6 @@ fun BottomNavigationBar(accentColor: Color, selectedIndex: Int, onItemSelected: 
     var maxWidthDp by remember { mutableStateOf(0.dp) }
     val buttonWidthDp = maxWidthDp / visualItems.size
 
-    // знайдемо, на якій візуальній позиції знаходиться поточний (логічний) selectedIndex
     val visualSelectedIndex = visualItems.indexOf(logicalItems[selectedIndex])
 
     val indicatorOffsetX by animateDpAsState(
@@ -129,7 +126,6 @@ fun BottomNavigationBar(accentColor: Color, selectedIndex: Int, onItemSelected: 
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // рендеримо у візуальному порядку, але при кліку передаємо логічний індекс
                 visualItems.forEachIndexed { visualIndex, item ->
                     val logicalIndexForThisItem = logicalItems.indexOf(item)
                     val isSelected = selectedIndex == logicalIndexForThisItem
@@ -151,7 +147,6 @@ fun BottomNavigationBar(accentColor: Color, selectedIndex: Int, onItemSelected: 
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
                             ) {
-                                // передаємо логічний індекс (щоб MainActivity не потребував змін)
                                 onItemSelected(logicalIndexForThisItem)
                             },
                         contentAlignment = Alignment.Center

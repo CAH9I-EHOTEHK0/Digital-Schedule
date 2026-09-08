@@ -51,36 +51,19 @@ object ScheduleParser {
     }
 
     private fun parseDoc(doc: org.jsoup.nodes.Document): List<Lesson> {
-        // Ключ для дедублікації: день+час+предмет+тип тижня
-        // Сайт генерує окремий пейн для КОЖНОГО тижня семестру (1,2,3,4,...).
-        // Непарні тижні семестру (1,3,5...) = тижневий тип 1
-        // Парні тижні семестру (2,4,6...)   = тижневий тип 2
-        // Ми беремо лише ПЕРШИЙ пейн непарного і ПЕРШИЙ пейн парного тижня.
-
-        val seen = mutableSetOf<String>() // для дедублікації
+        val seen = mutableSetOf<String>()
         val result = mutableListOf<Lesson>()
-
-        // Знайдемо перший непарний і перший парний пейн
-        // data-week-name зазвичай виглядає як "1 тиждень", "2 тиждень", або просто порядковий номер
-        // Простіше: беремо перші 2 пейни — перший = тиждень 1, другий = тиждень 2.
-        // АЛЕ якщо сайт показує поточний тиждень першим (не обов'язково непарний),
-        // треба визначати парність за атрибутом.
-
         val panes = doc.select("div[id^=week-pane-]")
-
-        // Визначаємо weekType за номером пейна в атрибуті id або data-week-name
-        // id="week-pane-1", "week-pane-2" тощо — число відповідає номеру тижня семестру
-        val processedWeekTypes = mutableSetOf<Int>() // вже оброблені типи (1 і 2)
+        val processedWeekTypes = mutableSetOf<Int>()
 
         for (weekPane in panes) {
-            if (processedWeekTypes.size == 2) break // вже маємо обидва типи
+            if (processedWeekTypes.size == 2) break
 
-            // Витягуємо номер тижня з id="week-pane-N"
             val weekNumStr = weekPane.id().removePrefix("week-pane-")
             val weekNum = weekNumStr.toIntOrNull() ?: continue
-            val weekType = if (weekNum % 2 == 1) 1 else 2 // непарний=1, парний=2
+            val weekType = if (weekNum % 2 == 1) 1 else 2
 
-            if (weekType in processedWeekTypes) continue // вже обробили цей тип
+            if (weekType in processedWeekTypes) continue
             processedWeekTypes.add(weekType)
 
             val dayHeaders = weekPane.select("div.grid-header-row div.grid-cell")
@@ -126,8 +109,6 @@ object ScheduleParser {
                             .map { it.text().trim() }.filter { it.isNotBlank() }
                         val group = badges.firstOrNull { it.startsWith("Потік") || it.startsWith("Група") }
 
-                        // Дедублікація: та сама пара може з'явитись у тижні 1 і тижні 3
-                        // (обидва непарні) — пропускаємо дублікати
                         val key = "$weekType|${dow.value}|$timeStart|$subject|$teacher"
                         if (seen.contains(key)) return@forEach
                         seen.add(key)

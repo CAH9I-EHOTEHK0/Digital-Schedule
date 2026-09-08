@@ -33,7 +33,6 @@ fun RatingScoreDialog(
     accentColor: Color,
     onDismiss: () -> Unit
 ) {
-    // 1. Поділ на враховані дисципліни та виключені
     val evaluatedGrades = grades.filter { it.points != null }
 
     val includedGrades = evaluatedGrades.filter { grade ->
@@ -54,7 +53,6 @@ fun RatingScoreDialog(
         isSelective || isCourseWork
     }
 
-    // 2. Розрахунок середнього арифметичного та рейтингового балу (* 0.9)
     val averageScore = if (includedGrades.isNotEmpty()) {
         includedGrades.mapNotNull { it.points }.average()
     } else 0.0
@@ -81,7 +79,6 @@ fun RatingScoreDialog(
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Заголовок
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -133,7 +130,6 @@ fun RatingScoreDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Картка з результатом
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -162,7 +158,6 @@ fun RatingScoreDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Враховані предмети
                 Text(
                     text = "Враховані дисципліни (${includedGrades.size})",
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
@@ -213,7 +208,6 @@ fun RatingScoreDialog(
                     }
                 }
 
-                // Виключені предмети (вибіркові / курсові)
                 if (excludedGrades.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(14.dp))
                     Text(
@@ -254,7 +248,6 @@ fun RatingScoreDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Пояснення
                 Text(
                     text = "ℹ️ Розрахунок приблизний: враховуються семестрові дисципліни та практики. Вибіркові предмети та курсові роботи виключені згідно з формулою рейтингу.",
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
